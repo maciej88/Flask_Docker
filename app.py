@@ -5,9 +5,26 @@ app = Flask(__name__)
 api = Api(app)
 
 
+def check_data(postedData, functionName):
+    if (functionName == "add"):
+        if "x" not in postedData or "y" not in postedData:
+            return 301
+        else:
+            return 200
+
+
 class Add(Resource):
     def post(self):
         postedData = request.get_json()
+
+        status_code = check_data(postedData, "add")
+        if (status_code != 200):
+            retJson = {
+                "Message": "An error",
+                "Status Code": status_code
+            }
+            return jsonify(retJson)
+
         x = postedData["x"]
         y = postedData["y"]
         x = int(x)
