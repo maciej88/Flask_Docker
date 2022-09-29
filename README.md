@@ -1,2 +1,5 @@
 # Flask_Docker
-For Docker tutorial
+Tutorial for:
+- Docker,
+- Flask,
+- MongoDB
