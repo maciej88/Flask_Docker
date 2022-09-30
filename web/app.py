@@ -5,6 +5,22 @@ from pymongo import MongoClient
 app = Flask(__name__)
 api = Api(app)
 
+client = MongoClient("mongodb://db:27017")
+db = client.aNewDB
+UserNum = db["UserNum"]
+
+UserNum.insert_one({
+    "num_users":0
+})
+
+
+class Visit(Resource):
+    def get(self):
+        prev_num = UserNum.find({})[0]["num_users"]
+        new_num = prev_num + 1
+        UserNum.update_one({}, { "$set": {"num_users": new_num}})
+        return str(f"Hello user {str(new_num)}")
+
 
 def check_data(postedData, functionName):
     if (functionName == "add" or functionName == "subtract" or functionName == "multiply"):
@@ -19,6 +35,7 @@ def check_data(postedData, functionName):
             return 302
         else:
             return 200
+
 
 class Add(Resource):
     def post(self):
@@ -92,7 +109,6 @@ class Multiply(Resource):
         return jsonify(retMap)
 
 
-
 class Divide(Resource):
     def post(self):
         postedData = request.get_json()
@@ -109,7 +125,7 @@ class Divide(Resource):
         y = postedData["y"]
         x = int(x)
         y = int(y)
-        ret = (x*1.0) / y
+        ret = (x * 1.0) / y
         retMap = {
             'Divide': ret,
             'Status Code': 200,
@@ -117,11 +133,12 @@ class Divide(Resource):
         return jsonify(retMap)
 
 
-
 api.add_resource(Add, "/add")
 api.add_resource(Subtract, "/subtract")
 api.add_resource(Multiply, "/multiply")
 api.add_resource(Divide, "/divide")
+api.add_resource(Visit, "/hello")
+
 
 @app.route('/')
 def hello_world():
