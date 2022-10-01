@@ -93,9 +93,41 @@ class Store(Resource):
         }
         return jsonify(retJson)
 
+class Get(Resource):
+    def get(self):
+        postedData = request.get_json()
+
+        username = postedData["Username"]
+        password = postedData["Password"]
+
+        correct_p = verify_password(username, password)
+
+        if not correct_p:
+            retJson = {
+                "status": 302
+            }
+            return jsonify(retJson)
+
+        num_token = count_tokens(username)
+        if num_token <= 0:
+            retJson = {
+                "status": 301
+            }
+            return jsonify(retJson)
+
+        sentence = users.find({
+            "Username": username
+        })[0]["Sentence"]
+
+        retJson = {
+            "status": 200,
+            "sentence": sentence
+        }
+        return jsonify(retJson)
 
 api.add_resource(Register, '/register')
 api.add_resource(Store, '/store')
+api.add_resource((Get, '/get'))
 
 """
 from flask import Flask, jsonify, request
