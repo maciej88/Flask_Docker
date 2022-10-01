@@ -94,7 +94,7 @@ class Store(Resource):
         return jsonify(retJson)
 
 class Get(Resource):
-    def get(self):
+    def post(self):
         postedData = request.get_json()
 
         username = postedData["Username"]
