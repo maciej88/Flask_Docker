@@ -26,7 +26,8 @@ class Register(Resource):
         users.insert_one({
             "Username": username,
             "Password": password,
-            "Sentence": ""
+            "Sentence": "",
+            "Tokens": 6
         })
 
         retJson = {
@@ -35,6 +36,45 @@ class Register(Resource):
         }
         return jsonify(retJson)
 
+class Store(Resource):
+    def post(self):
+        postedData =  request.get_json()
+
+        username = postedData["username"]
+        password = postedData["password"]
+        sentence = postedData["sentence"]
+
+        correct_p = verifyPw(username, password)
+
+        if not correct_p:
+            retJson = {
+                "status": 302
+            }
+            return jsonify(retJson)
+
+        num_token = countTok(username)
+        if num_token <= 0:
+            retJson = {
+                "status": 301
+            }
+            return jsonify(retJson)
+
+        users.update_one({
+            "Username": username
+        },
+            {"$set":
+                 {
+                     "Sentence": sentence,
+                     "Tokens": num_token-1
+                 }})
+
+        retJson = {
+            "status": 200,
+            "msg": "sentence saved"
+        }
+        return jsonify(retJson)
+
+api.add_resource(Register, '/register')
 
 """
 from flask import Flask, jsonify, request
