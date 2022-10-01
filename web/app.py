@@ -22,7 +22,18 @@ class Register(Resource):
         # hashing password by bcrypt
         hashed_p = bcrypt.hashpw(password, bcrypt.gensalt())
 
+        # store user log and pass in db:
+        users.insert_one({
+            "Username": username,
+            "Password": password,
+            "Sentence": ""
+        })
 
+        retJson = {
+            "status": 200,
+            "msg": "Success signed in API"
+        }
+        return jsonify(retJson)
 
 
 """
