@@ -10,6 +10,24 @@ client = MongoClient("mongodb://db:27017")
 db = client.SentenceDatabase
 users = db["Users"]
 
+
+def verify_password(username, password):
+    hashed_p = users.find({
+        "Username": username
+    })[0]["Password"]
+    if bcrypt.hashpw(password.encode('utf8'), hashed_p) == hashed_p:
+        return True
+    else:
+        return False
+
+
+def count_tokens(username):
+    tokens = users.find({
+        "Username": username
+    })[0]["Tokens"]
+    return tokens
+
+
 class Register(Resource):
     def post(self):
         # get posted data from user:
@@ -36,15 +54,16 @@ class Register(Resource):
         }
         return jsonify(retJson)
 
+
 class Store(Resource):
     def post(self):
-        postedData =  request.get_json()
+        postedData = request.get_json()
 
         username = postedData["username"]
         password = postedData["password"]
         sentence = postedData["sentence"]
 
-        correct_p = verifyPw(username, password)
+        correct_p = verify_password(username, password)
 
         if not correct_p:
             retJson = {
@@ -52,7 +71,7 @@ class Store(Resource):
             }
             return jsonify(retJson)
 
-        num_token = countTok(username)
+        num_token = count_tokens(username)
         if num_token <= 0:
             retJson = {
                 "status": 301
@@ -63,16 +82,17 @@ class Store(Resource):
             "Username": username
         },
             {"$set":
-                 {
-                     "Sentence": sentence,
-                     "Tokens": num_token-1
-                 }})
+                {
+                    "Sentence": sentence,
+                    "Tokens": num_token - 1
+                }})
 
         retJson = {
             "status": 200,
             "msg": "sentence saved"
         }
         return jsonify(retJson)
+
 
 api.add_resource(Register, '/register')
 
