@@ -1,6 +1,7 @@
 from flask import Flask, jsonify, request
 from flask_restful import Api, Resource
 from pymongo import MongoClient
+import bcrypt
 
 app = Flask(__name__)
 api = Api(app)
@@ -17,6 +18,10 @@ class Register(Resource):
         # data grab:
         username = postedData["username"]
         password = postedData["password"]
+
+        # hashing password by bcrypt
+        hashed_p = bcrypt.hashpw(password, bcrypt.gensalt())
+
 
 
 
