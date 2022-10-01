@@ -20,7 +20,7 @@ class Register(Resource):
         password = postedData["password"]
 
         # hashing password by bcrypt
-        hashed_p = bcrypt.hashpw(password, bcrypt.gensalt())
+        hashed_p = bcrypt.hashpw(password.encode('utf8'), bcrypt.gensalt())
 
         # store user log and pass in db:
         users.insert_one({
