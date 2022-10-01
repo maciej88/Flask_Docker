@@ -95,6 +95,7 @@ class Store(Resource):
 
 
 api.add_resource(Register, '/register')
+api.add_resource(Store, '/store')
 
 """
 from flask import Flask, jsonify, request
